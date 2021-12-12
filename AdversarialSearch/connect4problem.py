@@ -14,10 +14,10 @@
 
 
 from typing import Tuple
-from adversarialsearchproblem import AdversarialSearchProblem, GameUI, GameState
+from AdversarialSearch.adversarialsearchproblem import AdversarialSearchProblem, GameUI, GameState
 from . import connect4utils as c4utils
 import numpy as np
-import pygame
+# import pygame
 import sys
 
 
@@ -61,8 +61,8 @@ class Connect4Problem(AdversarialSearchProblem[Connect4State, Action]):
                 The board and player_to_move together constitute the start state
                 of the game
         """
-        if board == None:
-            board = c4utils.create_board(dims)
+        '''if board == None:
+            board = c4utils.create_board(dims)'''
         self._rows, self._cols = board.shape
         self._start_state = Connect4State(board, player_to_move)
 

@@ -1,6 +1,6 @@
 from typing import Callable
 
-from adversarialsearchproblem import (
+from AdversarialSearch.adversarialsearchproblem import (
     Action,
     AdversarialSearchProblem,
     State as GameState,

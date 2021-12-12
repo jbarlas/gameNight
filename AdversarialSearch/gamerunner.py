@@ -144,7 +144,7 @@ def main():
     p1_score, p2_score = run_game(game, players, game_ui)
     print(f"P1 score: {p1_score}, P2 score: {p2_score}")
 
-    # time.sleep(10) #(uncomment to keep GUI visible after end of game)
+    time.sleep(10) #(uncomment to keep GUI visible after end of game)
 
 
 if __name__ == "__main__":
