@@ -88,7 +88,7 @@ if ptm == 0:
 elif ptm == 1:
     gamestate[move[0]][move[1]] = "O"
 
-print("\n Best move:")
+print("\n Best move :")
 new_board = TTTProblem(board=gamestate, player_to_move=ptm)
 ui = TTTUI(new_board)
 ui.render()
