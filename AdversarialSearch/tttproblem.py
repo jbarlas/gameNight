@@ -15,12 +15,13 @@
 ###############################################################################
 
 
+
 from typing import Tuple
-from adversarialsearchproblem import AdversarialSearchProblem, GameState, GameUI
+from AdversarialSearch.adversarialsearchproblem import AdversarialSearchProblem, GameState, GameUI
 import time
 import math
 
-SPACE = " "
+SPACE = "-"
 X = "X"  # Player 0 is X
 O = "O"  # Player 1 is O
 PLAYER_SYMBOLS = [X, O]
@@ -65,6 +66,8 @@ class TTTProblem(AdversarialSearchProblem[TTTState, Action]):
                 The board and player_to_move together constitute the start state
                 of the game
         """
+        self.board = board
+        self.player_to_move = player_to_move
         self._dim = dim
         if board == None:
             board = [[SPACE for _ in range(dim)] for _ in range(dim)]
@@ -114,7 +117,7 @@ class TTTProblem(AdversarialSearchProblem[TTTState, Action]):
         actions = set()
         for r in range(self._dim):
             for c in range(self._dim):
-                if state.board[r][c] == " ":
+                if state.board[r][c] == "-":
                     actions.add((r, c))
         return actions
 
@@ -228,7 +231,7 @@ class TTTUI(GameUI):
         self._asp = asp
         self._delay = delay
         self._state = TTTState(
-            [[SPACE for _ in range(asp._dim)] for _ in range(asp._dim)], 0
+            asp.board, asp.player_to_move
         )  # empty state
 
     def render(self):
