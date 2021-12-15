@@ -11,7 +11,8 @@ def imgshow(name,img):
     cv2.waitKey(0)
 
 # Read and process image
-file_name = "testImages\connect4_noise.jpg"
+file_name = "G:\My Drive\Fall 2021\CSCI 1430\gameNight\\testImages\connect4_img_test.jpg"
+noise = "G:\My Drive\Fall 2021\CSCI 1430\gameNight\\testImages\connect4_angle_w_pieces.jpg"
 img = cv2.imread(file_name)
 
 new_width = 500 # Resize
