@@ -1,5 +1,7 @@
-import cv2 
+import cv2
 import numpy as np
+from AdversarialSearch.connect4problem import Connect4Problem, Connect4GUI
+from AdversarialSearch import adversarialsearch
 
 def showimg(title, img):
     cv2.imshow(title, img)
@@ -7,11 +9,12 @@ def showimg(title, img):
     cv2.waitKey(0)
 
 # read in image
-angle_pieces = "G:\My Drive\Fall 2021\CSCI 1430\gameNight\\testImages\connect4_angle_w_pieces.jpg"
-standard = "G:\My Drive\Fall 2021\CSCI 1430\gameNight\\testImages\connect4_img_test.jpg"
-bright_noise = "G:\My Drive\Fall 2021\CSCI 1430\gameNight\\testImages\connect4_bright_noise.jpg"
-not_great = "G:\My Drive\Fall 2021\CSCI 1430\gameNight\\testImages\connect4_not_great.jfif"
-board_image = cv2.imread(not_great)
+angle_pieces = "testImages\connect4_angle_w_pieces.jpg"
+standard = "testImages\connect4_img_test.jpg"
+bright_noise = "testImages\connect4_bright_noise.jpg"
+not_great = "testImages\connect4_not_great.jfif"
+angle_pieces_unsolve = "testImages\connect4_angle_w_pieces_unsolved.png"
+board_image = cv2.imread(angle_pieces)
 
 # process image
 new_width = 750
@@ -181,6 +184,98 @@ cv2.drawContours(grid_overlay,  for_line,  -1, (0,255,0), thickness=1)
 showimg('grid overlay', grid_overlay)
 
 
+
+# filter by color
+img_hsv = cv2.cvtColor(img_orig, cv2.COLOR_BGR2HSV) 
+
+lower_red = np.array([150, 150, 100])  
+upper_red = np.array([255, 255, 255])  
+mask_red = cv2.inRange(img_hsv, lower_red, upper_red)
+img_red = cv2.bitwise_and(img_orig, img_orig, mask=mask_red)
+showimg("Red Mask",img_red)
+
+lower_yellow = np.array([10, 150, 100])
+upper_yellow = np.array([60, 255, 255])
+mask_yellow = cv2.inRange(img_hsv, lower_yellow, upper_yellow)
+img_yellow = cv2.bitwise_and(img_orig, img_orig, mask=mask_yellow)
+showimg("Yellow Mask",img_yellow)
+
+rows = 6
+cols = 7
+
+# identify piece color
+grid = np.zeros((rows,cols))
+id_red = 1
+id_yellow = 2
+img_grid_overlay = img_orig.copy()
+img_grid = np.zeros([img_height,img_width,3], dtype=np.uint8)
+
+for c in range(cols):
+    for r in range(rows):
+        x = int(grid_centers[r][c][0])
+        y = int(grid_centers[r][c][1])
+        rad = 20
+        img_grid_circle = np.zeros((img_height, img_width))
+        cv2.circle(img_grid_circle, (x,y), rad, (255,255,255),thickness=-1)
+        img_res_red = cv2.bitwise_and(img_grid_circle, img_grid_circle, mask=mask_red)
+        img_grid_circle = np.zeros((img_height, img_width))
+        cv2.circle(img_grid_circle, (x,y), rad, (255,255,255),thickness=-1)
+        img_res_yellow = cv2.bitwise_and(img_grid_circle, img_grid_circle,mask=mask_yellow)
+        cv2.circle(img_grid_overlay, (x,y), rad, (0,255,0),thickness=1)
+        if img_res_red.any() != 0:
+            grid[r][c] = id_red
+            cv2.circle(img_grid, (x,y), rad, (0,0,255),thickness=-1)
+        elif img_res_yellow.any() != 0 :
+            grid[r][c] = id_yellow
+            cv2.circle(img_grid, (x,y), rad, (0,255,255),thickness=-1)
+grid_to_print = np.flipud(grid)
+for i in range(len(grid)):
+    grid_to_print[i] = np.flipud(grid_to_print[i])
+
+print('Grid Detected:\n', grid_to_print)
+showimg('Img Grid Overlay',img_grid_overlay)
+showimg('Img Grid',img_grid)
+
+# determine best move
+num_red = sum([np.count_nonzero(row == 1) for row in grid])
+num_yellow = sum([np.count_nonzero(row == 2) for row in grid])
+
+if not any([0 in row for row in grid]):
+    grid_full = True
+    print("Grid Full")
+
+elif num_red < num_yellow:
+    board = Connect4Problem(board=grid)
+    move = (adversarialsearch.alpha_beta_cutoff(board, 5, board.heuristic_func), id_red)
+    print(move)
+    #move = (ConnectFourAI.bestMove(grid*(-1), 1, -1), id_yellow)
+    print("Red To Move: Column {}".format(move[0]+1))
+    
+else:
+    board = Connect4Problem(board=grid)
+    move = (adversarialsearch.alpha_beta_cutoff(board, 5, board.heuristic_func), id_yellow)
+    print(move)
+    #move = (ConnectFourAI.bestMove(grid, 1, -1), id_red)
+    print("Yellow To Move: Column {}".format(move[0]+1))
+    
+
+# display image with output
+if any([0 in row for row in grid]):
+    img_output = img_orig.copy()
+    empty_slots = sum([ row[move[0]] == 0 for row in grid ])
+    col = move[0]
+    row = np.where(grid[:, col]==0)[0][0]
+    (x, y) = (int(grid_centers[row][col][0]), int(grid_centers[row][col][1]))
+    if move[1] == id_red:
+        cv2.circle(img_output, (x+6,y+3), 20, (0,0,255),thickness=-1)
+    if move[1] == id_yellow:
+        cv2.circle(img_output, (x+6,y+3), r+4, (0,255,255),thickness=-1)
+    cv2.circle(img_output, (x+6,y+3), 22, (0, 0, 0),thickness=2)
+
+    showimg("output",img_output)
+
+
+cv2.destroyAllWindows()
 
 
 

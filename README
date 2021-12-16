@@ -1,1 +1,3 @@
-README for CV Final
+Final Project for CSCI 1430: Computer Vision 
+
+Both connect4cv.py and tttcv.py can be run in the terminal, if you wish to change the images, you can change the input image manually in each of the files. See Final Report for more information (: 
